@@ -21,11 +21,13 @@ class Spot(BaseModel):
     :param id(int): 当前景点的索引
     :param name(str): 景点名称
     :param description(str): 景点简介
+    :param deleted(bool): 景点是否已删除
     :param paths(List[Path]): 从当前景点出发的路径列表
     """
     id: int = Field(..., description="景点的整数索引")
     name: str = Field(..., description="景点名称")
     description: str = Field(..., description="景点简介")
+    deleted: bool = Field(False, description="景点是否已删除")
     paths: List[Path] = [] 
 
 class TourGraph(BaseModel):
