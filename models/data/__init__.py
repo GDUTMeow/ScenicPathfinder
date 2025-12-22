@@ -7,16 +7,19 @@ from models.graph import TourGraph
 from context import get_workdir
 
 class ApplicationData(BaseModel):
-    graph: TourGraph
-    last_updated: datetime
+    graph: TourGraph = Field(default_factory=lambda: TourGraph(spots=[]))
     file: str = Field(default_factory=lambda: os.path.join(get_workdir(), "data/graph.json"))
     
-    def save(self, filepath: str = file):
+    def save(self, filepath: str | None = None):
+        if filepath is None:
+            filepath = str(self.file)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "w") as f:
             f.write(self.graph.model_dump_json())
             
-    def read(self, filepath: str = file):
+    def read(self, filepath: str | None = None):
+        if filepath is None:
+            filepath = str(self.file)
         if os.path.exists(filepath):
             with open(filepath, "r") as f:
                 self.graph = TourGraph.model_validate_json(f.read())

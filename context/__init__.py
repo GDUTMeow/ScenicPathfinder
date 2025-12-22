@@ -6,4 +6,4 @@ def get_workdir() -> str:
     if getattr(sys, "frozen", False):
         return os.path.dirname(sys.executable)
     # 源码运行时
-    return os.path.dirname(os.path.abspath(__file__))
+    return os.getcwd()
