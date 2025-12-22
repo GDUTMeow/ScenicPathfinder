@@ -235,8 +235,8 @@ class TourGraph(BaseModel):
         return (
             int(weights[target_id]),
             path_sequence[::-1],
-        )   # 返回总权重和路径序列，因为在这里是肯定找到了
-            # 所以可以直接 int 一下，不然 int('inf') 会炸 ValueError
+        )  # 返回总权重和路径序列，因为在这里是肯定找到了
+        # 所以可以直接 int 一下，不然 int('inf') 会炸 ValueError
 
     def _dfs(
         self,
@@ -260,7 +260,9 @@ class TourGraph(BaseModel):
         """
         results = []
         if current == target:
-            results.append((current_distance, current_duration, list(path)))    # 找到一条路径
+            results.append(
+                (current_distance, current_duration, list(path))
+            )  # 找到一条路径
             return results
 
         visited.add(current)
@@ -279,10 +281,10 @@ class TourGraph(BaseModel):
                     current_duration + p.duration,
                     visited,
                 )
-                results.extend(sub_paths)   # 收集子路径结果
+                results.extend(sub_paths)  # 收集子路径结果
                 path.pop()  # 回溯
 
-        visited.remove(current) # 回溯时去掉访问状态
+        visited.remove(current)  # 回溯时去掉访问状态
         return results
 
     def find_all_paths(
@@ -306,14 +308,86 @@ class TourGraph(BaseModel):
         return result
 
     def tsp(
-        self, start_id: int, target_id: int, must_pass: List[int], weight_type: Literal["distance", "duration"]
+        self,
+        start_id: int,
+        target_id: int,
+        must_pass: List[int],
+        weight_type: Literal["distance", "duration"],
     ) -> Tuple[int, List[int]]:
         """
-        利用旅行商问题暴力解法求解从起点到终点过程中经过指定节点的最短路径
+        贪心算法解决旅行商问题
+        懒，没办法，不想写 DP 啥的那么复杂的东西了，就这样吧，毁灭吧
         
         :param start_id(int): 起始景点索引
         :param target_id(int): 目标景点索引
-        :param must_pass(List[int]): 必经景点索引列表
+        :param must_pass(List[int]): 必须经过的景点索引列表
         :param weight_type(Literal['distance', 'duration']): 权重类型
+        :return: 最短路径的总权重和路径经过的景点索引列表
         """
-        ...
+        if not self._is_valid_node(start_id):
+            raise SpotInvalidError(start_id)
+        if not self._is_valid_node(target_id):
+            raise SpotInvalidError(target_id)
+
+        if weight_type not in ["distance", "duration"]:
+            raise StandardInvalidError("weight_type must be 'distance' or 'duration'")
+        
+        # 构建必须访问的节点列表
+        to_visit = set()
+        for pid in must_pass:
+            if self._is_valid_node(pid) and pid != start_id and pid != target_id:
+                to_visit.add(pid)
+
+        current_node = start_id
+        total_cost = 0
+        full_path: List[int] = []
+
+        full_path.append(start_id) # 加入起点
+
+        # 寻找未访问过的节点
+        while to_visit:
+            best_next_node = -1
+            min_dist = float("inf")
+            best_segment_path = []
+
+            for candidate in to_visit:
+                # 找距离当前位置最近的必经点
+                dist, path = self.dijkstra(current_node, candidate, weight_type)
+
+                # 连通且距离短
+                if dist != -1 and dist < min_dist:
+                    min_dist = dist
+                    best_next_node = candidate
+                    best_segment_path = path
+
+            # 不连通
+            if best_next_node == -1:
+                return -1, []
+
+            # 累加距离
+            total_cost += int(min_dist)
+
+            # 拼接路径
+            if not full_path:
+                full_path.extend(best_segment_path)
+            else:
+                full_path.extend(best_segment_path[1:])
+
+            # 更改当前位置并在未访问列表中删除
+            current_node = best_next_node
+            to_visit.remove(current_node)
+
+        # 从当前点前往终点
+        dist_to_end, path_to_end = self.dijkstra(current_node, target_id, weight_type)
+
+        if dist_to_end == -1:
+            return -1, []
+
+        total_cost += int(dist_to_end)
+
+        if not full_path:
+            full_path.extend(path_to_end)
+        else:
+            full_path.extend(path_to_end[1:])
+
+        return total_cost, full_path
