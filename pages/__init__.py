@@ -21,3 +21,20 @@ ADMIN_REMOVE_PATH_PAGE = Page("pages/admin/remove_path.py", title="删除道路"
 
 DEBUG_DATA_VIEW_PAGE = Page("pages/debug/data_view.py", title="数据查看")
 DEBUG_GENERATE_DATA_PAGE = Page("pages/debug/generate_data.py", title="生成测试数据")
+
+__all__ = [
+    "HOME_PAGE",
+    "GUEST_FIND_SPOT_PAGE",
+    "GUEST_FIND_SHORTEST_PATH_PAGE",
+    "GUEST_FIND_ALL_SIMPLE_PATH_PAGE",
+    "GUEST_GET_PLAN_PAGE",
+    "GUEST_VIEW_MAP_PAGE",
+    "ADMIN_ADD_SPOT_PAGE",
+    "ADMIN_REMOVE_SPOT_PAGE",
+    "ADMIN_MODIFY_SPOT_PAGE",
+    "ADMIN_ADD_PATH_PAGE",
+    "ADMIN_MODIFY_PATH_PAGE",
+    "ADMIN_REMOVE_PATH_PAGE",
+    "DEBUG_DATA_VIEW_PAGE",
+    "DEBUG_GENERATE_DATA_PAGE",
+]
