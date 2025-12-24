@@ -5,8 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "matplotlib>=3.10.8",
+    "networkx>=3.6.1",
     "pydantic>=2.12.5",
     "streamlit>=1.52.2",
+    "streamlit-agraph>=0.0.45",
     "watchdog>=6.0.0",
 ]
 

@@ -9,13 +9,26 @@ class GraphError(ScenicPathfinderError):
     ...
 
 
-class SpotInvalidError(GraphError):
+class SpotIdInvalidError(GraphError):
     """景点无效异常"""
 
     def __init__(self, spot_id: int):
         self.spot_id = spot_id
         super().__init__(f"景点 ID {spot_id} 无效或已被删除")
 
+class SpotNameInvalidError(GraphError):
+    """景点名称无效异常"""
+
+    def __init__(self, spot_name: str):
+        self.spot_name = spot_name
+        super().__init__(f"景点名称 {spot_name} 无效或已被删除")
+
+class SpotNameDuplicateError(GraphError):
+    """景点名称重复异常"""
+
+    def __init__(self, spot_name: str):
+        self.spot_name = spot_name
+        super().__init__(f"景点名称 {spot_name} 已存在，不能重复添加")
 
 class StandardInvalidError(GraphError):
     """标准无效异常"""

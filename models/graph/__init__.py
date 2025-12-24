@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import heapq
-import itertools
 
 from pydantic import BaseModel, Field, constr
 from typing import Dict, List, Optional, Literal, Tuple
 
-from exceptions import SpotInvalidError, StandardInvalidError
+from exceptions import (
+    SpotIdInvalidError,
+    StandardInvalidError,
+    SpotNameInvalidError,
+    SpotNameDuplicateError,
+)
 
 
 class Path(BaseModel):
@@ -69,12 +73,26 @@ class TourGraph(BaseModel):
         """
         return 0 <= node_id < len(self.spots) and not self.spots[node_id].deleted
 
+    def _have_same_spot_name(self, name: str) -> bool:
+        """
+        判断是否存在同名景点
+
+        :param name(str): 景点名称
+        :return: 是否存在同名景点
+        """
+        for spot in self.spots:
+            if spot.name == name and not spot.deleted:
+                return True
+        return False
+
     def add_node(self, spot: Spot) -> int:
         """
         添加一个新的景点
 
         :param spot(Spot): 景点节点
         """
+        if self._have_same_spot_name(spot.name):
+            raise SpotNameDuplicateError(spot.name)
         node_id = len(self.spots)
         spot = Spot(id=node_id, name=spot.name, description=spot.description)
         self.spots.append(spot)
@@ -186,9 +204,9 @@ class TourGraph(BaseModel):
         :return: 最短路径的总权重和路径经过的景点索引列表
         """
         if not self._is_valid_node(start_id):
-            raise SpotInvalidError(start_id)
+            raise SpotIdInvalidError(start_id)
         if not self._is_valid_node(target_id):
-            raise SpotInvalidError(target_id)
+            raise SpotIdInvalidError(target_id)
 
         weights = {
             spot.id: float("inf") for spot in self.spots if not spot.deleted
@@ -298,12 +316,17 @@ class TourGraph(BaseModel):
         :return: 所有路径的列表，每条路径包含 (总距离, 总时间, 路径经过的景点索引列表)
         """
         if not self._is_valid_node(start_id):
-            raise SpotInvalidError(start_id)
+            raise SpotIdInvalidError(start_id)
         if not self._is_valid_node(target_id):
-            raise SpotInvalidError(target_id)
+            raise SpotIdInvalidError(target_id)
 
         result = self._dfs(
-            start_id, target_id, [start_id], target_id, [start_id], 0, 0, set()
+            start_id,
+            target_id,
+            path=[start_id],
+            current_distance=0,
+            current_duration=0,
+            visited=set(),
         )
         return result
 
@@ -317,7 +340,7 @@ class TourGraph(BaseModel):
         """
         贪心算法解决旅行商问题
         懒，没办法，不想写 DP 啥的那么复杂的东西了，就这样吧，毁灭吧
-        
+
         :param start_id(int): 起始景点索引
         :param target_id(int): 目标景点索引
         :param must_pass(List[int]): 必须经过的景点索引列表
@@ -325,13 +348,13 @@ class TourGraph(BaseModel):
         :return: 最短路径的总权重和路径经过的景点索引列表
         """
         if not self._is_valid_node(start_id):
-            raise SpotInvalidError(start_id)
+            raise SpotIdInvalidError(start_id)
         if not self._is_valid_node(target_id):
-            raise SpotInvalidError(target_id)
+            raise SpotIdInvalidError(target_id)
 
         if weight_type not in ["distance", "duration"]:
             raise StandardInvalidError("weight_type must be 'distance' or 'duration'")
-        
+
         # 构建必须访问的节点列表
         to_visit = set()
         for pid in must_pass:
@@ -342,7 +365,7 @@ class TourGraph(BaseModel):
         total_cost = 0
         full_path: List[int] = []
 
-        full_path.append(start_id) # 加入起点
+        full_path.append(start_id)  # 加入起点
 
         # 寻找未访问过的节点
         while to_visit:
@@ -391,3 +414,15 @@ class TourGraph(BaseModel):
             full_path.extend(path_to_end[1:])
 
         return total_cost, full_path
+
+    def find_spot_by_name(self, name: str) -> Spot:
+        """
+        根据景点名称查找景点
+
+        :param name(str): 景点名称
+        :return: 找到的景点对象
+        """
+        for spot in self.spots:
+            if spot.name == name and not spot.deleted:
+                return spot
+        raise SpotNameInvalidError(name)
