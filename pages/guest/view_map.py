@@ -1,7 +1,6 @@
 import streamlit as st
 import networkx as nx
 import matplotlib.pyplot as plt
-from streamlit_agraph import agraph, Node, Edge, Config
 
 data = st.session_state.app_data
 

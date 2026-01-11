@@ -8,8 +8,8 @@ dependencies = [
     "matplotlib>=3.10.8",
     "networkx>=3.6.1",
     "pydantic>=2.12.5",
+    "pyinstaller>=6.17.0",
     "streamlit>=1.52.2",
-    "streamlit-agraph>=0.0.45",
     "watchdog>=6.0.0",
 ]
 
