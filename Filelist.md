@@ -1,0 +1,46 @@
+# 文件列表及功能说明
+
+- ScenicPathfinder/
+  - context/
+    - `__init__.py` 提供程序所需要的上下文路径。
+  - exceptions/
+    - `__init__.py` 提供了程序里自定义的所有异常，便于抛出后进行对应的处理。
+  - hooks/
+    - `hook.py` 为首次生成打包配置文件的时候提供一定的信息
+  - models/
+    - config/
+      - `__init__.py` 存放了程序的相关信息及元数据
+    - data/
+      - `__init__.py` 存放了程序的数据定义，封装了数据文件的读取读取与存储
+    - graph
+      - `__init__.py` 包含对图、节点、边的定义，以及包括所有与图相关的操作
+  - pages/
+    - admin/
+      - `add_path.py` 添加路径的视图页面
+      - `add_spot.py` 添加景点的视图页面
+      - `modify_path.py` 修改路径的视图页面
+      - `modify_spot.py` 修改景点的视图页面
+      - `remove_path.py` 删除路径的视图页面
+      - `remove_spot.py` 删除景点的视图页面
+    - debug/
+      - `data_view.py` 调试模式原始数据查看的视图页面
+      - `generate_data.py` 生成测试数据的视图页面
+    - guest/
+      - `find_all_simple_path.py` 寻找所有简单路径的视图页面
+      - `find_shortest_path.py` 寻找权重最小路径的视图页面
+      - `find_spot.py` 查询特定节点信息的视图页面
+      - `get_plan.py` 获取经过必经景点的路径规划的视图页面
+      - `view_map.py` 查看经典地图的视图页面
+    -  `__init__.py` 定义所有页面的文件
+    - `home.py` 主页页面，包含了题目的要求
+  - resources/
+    - `favicon.ico` 软件图标
+  - `app.py` Streamlit 程序入口
+  - `build.bat` 打包程序使用的脚本文件
+  - `Filelist.md` 文件列举及说明
+  - `launcher.py` 用于被打包程序的主入口文件
+  - `launcher.spec` 打包程序所使用到的数据文件
+  - `pyproject.toml` 项目元数据文件
+  - `README.md` 项目自述文件
+  - `uv.lock` 项目依赖版本锁定文件
+
