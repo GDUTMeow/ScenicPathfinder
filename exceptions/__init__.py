@@ -36,3 +36,11 @@ class StandardInvalidError(GraphError):
     def __init__(self, standard: str):
         self.standard = standard
         super().__init__(f"搜索标准 {standard} 无效，必须为 `distance` 或者 `duration`")
+
+class PathDuplicateError(GraphError):
+    """路径重复异常"""
+
+    def __init__(self, from_id: int, to_id: int):
+        self.from_id = from_id
+        self.to_id = to_id
+        super().__init__(f"景点 ID {from_id} 和景点 ID {to_id} 之间的路径已存在，不能重复添加")

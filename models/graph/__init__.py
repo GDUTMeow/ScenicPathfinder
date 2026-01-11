@@ -10,6 +10,7 @@ from exceptions import (
     StandardInvalidError,
     SpotNameInvalidError,
     SpotNameDuplicateError,
+    PathDuplicateError
 )
 
 
@@ -109,6 +110,13 @@ class TourGraph(BaseModel):
         """
         from_spot = self.spots[from_id]
         to_spot = self.spots[to_id]
+        # 确认两点之间不存在路径
+        for path in from_spot.paths:
+            if path.target_id == to_id:
+                raise PathDuplicateError(from_id, to_id)
+        for path in to_spot.paths:
+            if path.target_id == from_id:
+                raise PathDuplicateError(from_id, to_id)
         from_spot.paths.append(
             Path(target_id=to_id, distance=distance, duration=duration)
         )
